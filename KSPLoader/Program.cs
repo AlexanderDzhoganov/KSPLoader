@@ -98,26 +98,22 @@ namespace KSPLoader
 
         static void Main(string[] args)
         {
-            AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly("C:/Users/Alex Dzhoganov/Documents/GitHub/KSPLoader/TestLib/bin/Debug/TestLib.dll");
+            AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly("C:/Users/Alex Dzhoganov/Desktop/Assembly-CSharp.dll");
 
-            var fooType = myLibrary.MainModule.GetType("TestLib", "Foo");
+            var fooType = myLibrary.MainModule.GetType("", "RnDBuilding");
 
-            var barType = myLibrary.MainModule.Import(typeof(PatchLib.Bar)).Resolve();
+            var barType = myLibrary.MainModule.Import(typeof(PatchLib.RnDBuilding)).Resolve();
 
             Console.WriteLine("Replacing all TestLib.Foo references with PatchLib.Bar");
             foreach (var typeDef in myLibrary.MainModule.Types)
             {
                 foreach (var methodDef in typeDef.Methods)
                 {
-                    var name = methodDef.FullName;
-                    if (name == "System.Single TestLib.Test::TestFoo()" || name == "TestLib.Foo TestLib.Test::ReturnNewFoo()")
-                    {
-                        ProcessMethod(methodDef, fooType, barType);
-                    }
+                    ProcessMethod(methodDef, fooType, barType);
                 }
             }
 
-            myLibrary.Write("C:/Users/Alex Dzhoganov/Documents/GitHub/KSPLoader/TestLib/bin/Debug/TestLib.dll");
+            myLibrary.Write("C:/Users/Alex Dzhoganov/Desktop/Assembly-CSharp_patched.dll");
             Console.WriteLine("Assembly succesfully patched");
 
             for (; ; ) ;
