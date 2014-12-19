@@ -10,8 +10,7 @@ namespace TestExecutable
     {
         static void Main(string[] args)
         {
-            TestLib.Class1 foo = new TestLib.Class1();
-            Console.WriteLine("GetFoo() returned {0}", foo.GetFoo());
+            Console.WriteLine("TestFoo() returned {0}", TestLib.Test.TestFoo());
             for (; ; ) ;
         }
     }
