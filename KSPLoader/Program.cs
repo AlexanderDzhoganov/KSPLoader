@@ -17,6 +17,12 @@ namespace KSPLoader
 
         private static void ProcessMethod(MethodDefinition method, TypeReference lookFor, TypeDefinition replaceWith)
         {
+            if (method.FullName == "System.Void FinePrint.WaypointManager::.ctor()")
+            {
+
+                int p = 5;
+            }
+
             bool methodPatched = false;
 
             TypeReference importedReplaceWith = method.Module.Import(replaceWith); 
@@ -28,7 +34,7 @@ namespace KSPLoader
 
                 if (method.ReturnType == lookFor)
                 {
-                    method.ReturnType = method.Module.Import(replaceWith);
+                    method.ReturnType = importedReplaceWith;
                     Console.WriteLine("Patching return type: Replacing {0} with {1}", lookFor.FullName, replaceWith.FullName);
                     methodPatched = true;
                 }
@@ -69,7 +75,9 @@ namespace KSPLoader
                             {
                                 if (replaceMethod.Name == methodName)
                                 {
-                                    instruction.Operand = method.Module.Import(replaceMethod);
+                                    var replaceOperand = method.Module.Import(replaceMethod);
+                                    instruction.Operand = replaceOperand;
+
                                     Console.WriteLine
                                     (
                                         "Patching InlineMethod: Replacing {0}::{1} with {2}::{3}",
@@ -106,7 +114,7 @@ namespace KSPLoader
 
             if (methodPatched)
             {
-                Console.WriteLine("Patched method {0}", method.FullName);
+                Console.WriteLine("### Patched method {0} ###", method.FullName);
             }
         }
 
@@ -117,7 +125,7 @@ namespace KSPLoader
 
             if (fieldTypeName == lookForTypeName)
             {
-                Console.WriteLine("Patching Field: Replacing {0} with {1}", lookFor.FullName, replaceWith.FullName);
+                Console.WriteLine("### Patched Field: Replacing {0} with {1} ###", lookFor.FullName, replaceWith.FullName);
             }
         }
 
@@ -128,7 +136,7 @@ namespace KSPLoader
 
             if (fieldTypeName == lookForTypeName)
             {
-                Console.WriteLine("Patching Property: Replacing {0} with {1}", lookFor.FullName, replaceWith.FullName);
+                Console.WriteLine("### Patched Property: Replacing {0} with {1} ###", lookFor.FullName, replaceWith.FullName);
             }
         }
 
@@ -143,7 +151,7 @@ namespace KSPLoader
                 return;
             }
 
-            var barType = myLibrary.MainModule.Import(typeof(PatchLib.XKCDColors)).Resolve();
+            var barType = myLibrary.MainModule.Import(typeof(PatchLib.XKCDColors_Patched)).Resolve();
 
             Console.WriteLine("Replacing all Assembly-CSharp.RndBuilding references with PatchLib.RnDBuilding");
             foreach (var typeDef in myLibrary.MainModule.Types)

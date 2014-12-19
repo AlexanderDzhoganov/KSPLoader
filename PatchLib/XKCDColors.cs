@@ -7,7 +7,7 @@ using UnityEngine;
 namespace PatchLib
 {
 
-public static class XKCDColors
+public static class XKCDColors_Patched
 {
   [Obsolete("This has been replaced by the Color.A(float) extension method.")]
   public static float NextColorAlpha = 1f;
