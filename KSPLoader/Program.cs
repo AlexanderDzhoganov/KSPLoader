@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Mono.Cecil;
 using System.Reflection;
 using Mono.Cecil.Cil;
@@ -103,8 +102,7 @@ namespace KSPLoader
 
             var fooType = myLibrary.MainModule.GetType("TestLib", "Foo");
 
-            TypeInfo barTypeInfo = typeof(PatchLib.Bar).GetTypeInfo();
-            var barType = myLibrary.MainModule.Import(barTypeInfo).Resolve();
+            var barType = myLibrary.MainModule.Import(typeof(PatchLib.Bar)).Resolve();
 
             Console.WriteLine("Replacing all TestLib.Foo references with PatchLib.Bar");
             foreach (var typeDef in myLibrary.MainModule.Types)
