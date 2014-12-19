@@ -9,11 +9,11 @@ namespace PatchLib
 
     public class Bar
     {
-        private float bar = 3.1415f;
+        private float foo = 3.1415f;
 
         public float GetFoo()
         {
-            return bar;
+            return foo;
         }
     }
 
