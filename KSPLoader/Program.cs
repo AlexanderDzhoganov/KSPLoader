@@ -18,16 +18,26 @@ namespace KSPLoader
 
         private static void ProcessMethod(MethodDefinition method, TypeReference lookFor, TypeDefinition replaceWith)
         {
+            Console.WriteLine("Patching method {0}", method.FullName);
+
+            TypeReference importedReplaceWith = method.Module.Import(replaceWith); 
+
             if (method.HasBody)
             {
                 Mono.Collections.Generic.Collection<Instruction> instructions = method.Body.Instructions;
                 Mono.Collections.Generic.Collection<VariableDefinition> types = method.Body.Variables;
 
+                if (method.ReturnType == lookFor)
+                {
+                    method.ReturnType = method.Module.Import(replaceWith);
+                    Console.WriteLine("Patching return type: Replacing {0} with {1}", lookFor.Name, replaceWith.Name);
+                }
+
                 for (int i = 0; i < types.Count; i++)
                 {
                     if (method.Body.Variables[i].VariableType == lookFor)
                     {
-                        method.Body.Variables[i].VariableType = method.Module.Import(replaceWith);
+                        method.Body.Variables[i].VariableType = importedReplaceWith;
                         Console.WriteLine("Patching local variable: Replacing {0} with {1}", lookFor.Name, replaceWith.Name);
                     }
                 }
@@ -42,7 +52,7 @@ namespace KSPLoader
                         var typeRef = (TypeReference)instruction.Operand;
                         if (typeRef.DeclaringType == lookFor)
                         {
-                            typeRef = method.Module.Import(replaceWith);
+                            typeRef = importedReplaceWith;
                             Console.WriteLine("Patching InlineMethod: Replacing {0} with {1}", lookFor.Name, replaceWith.Name);
                         }
                     }
@@ -65,6 +75,24 @@ namespace KSPLoader
 
                         }
                     }
+                    else if (operandType == OperandType.InlineField)
+                    {
+                        var fieldRef = (FieldReference)instruction.Operand;
+                        var fieldName = fieldRef.Name;
+
+                        if (fieldRef.DeclaringType == lookFor)
+                        {
+                            foreach (var replaceField in replaceWith.Fields)
+                            {
+                                if (replaceField.Name == fieldName)
+                                {
+                                    instruction.Operand = method.Module.Import(replaceField);
+                                    Console.WriteLine("Patching InlineField: Replacing {0}::{1} with {2}::{3}", lookFor.Name, fieldName, replaceWith.Name, replaceField.Name);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }   
             }
         }
@@ -84,7 +112,7 @@ namespace KSPLoader
                 foreach (var methodDef in typeDef.Methods)
                 {
                     var name = methodDef.FullName;
-                    if (name == "System.Single TestLib.Test::TestFoo()")
+                    if (name == "System.Single TestLib.Test::TestFoo()" || name == "TestLib.Foo TestLib.Test::ReturnNewFoo()")
                     {
                         ProcessMethod(methodDef, fooType, barType);
                     }

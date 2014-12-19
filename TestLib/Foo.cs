@@ -25,5 +25,10 @@ namespace TestLib
             return foo.GetFoo();
         }
 
+        public static Foo ReturnNewFoo()
+        {
+            return new Foo();
+        }
+
     }
 }
