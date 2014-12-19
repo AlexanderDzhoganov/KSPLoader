@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSPLoader", "KSPLoader.csproj", "{557A5948-B67E-4763-A306-3DF2321535B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLib", "..\TestLib\TestLib.csproj", "{2D99C2E4-3EB1-466C-8F2E-3865271F2A03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestExecutable", "TestExecutable\TestExecutable.csproj", "{A20218C1-2546-47C0-86B6-9601F414293B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{557A5948-B67E-4763-A306-3DF2321535B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{557A5948-B67E-4763-A306-3DF2321535B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{557A5948-B67E-4763-A306-3DF2321535B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{557A5948-B67E-4763-A306-3DF2321535B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D99C2E4-3EB1-466C-8F2E-3865271F2A03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D99C2E4-3EB1-466C-8F2E-3865271F2A03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D99C2E4-3EB1-466C-8F2E-3865271F2A03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D99C2E4-3EB1-466C-8F2E-3865271F2A03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A20218C1-2546-47C0-86B6-9601F414293B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A20218C1-2546-47C0-86B6-9601F414293B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A20218C1-2546-47C0-86B6-9601F414293B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A20218C1-2546-47C0-86B6-9601F414293B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
