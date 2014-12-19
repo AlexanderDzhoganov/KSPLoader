@@ -17,7 +17,7 @@ namespace KSPLoader
 
         private static void ProcessMethod(MethodDefinition method, TypeReference lookFor, TypeDefinition replaceWith)
         {
-            Console.WriteLine("Patching method {0}", method.FullName);
+            bool methodPatched = false;
 
             TypeReference importedReplaceWith = method.Module.Import(replaceWith); 
 
@@ -29,7 +29,8 @@ namespace KSPLoader
                 if (method.ReturnType == lookFor)
                 {
                     method.ReturnType = method.Module.Import(replaceWith);
-                    Console.WriteLine("Patching return type: Replacing {0} with {1}", lookFor.Name, replaceWith.Name);
+                    Console.WriteLine("Patching return type: Replacing {0} with {1}", lookFor.FullName, replaceWith.FullName);
+                    methodPatched = true;
                 }
 
                 for (int i = 0; i < types.Count; i++)
@@ -37,7 +38,8 @@ namespace KSPLoader
                     if (method.Body.Variables[i].VariableType == lookFor)
                     {
                         method.Body.Variables[i].VariableType = importedReplaceWith;
-                        Console.WriteLine("Patching local variable: Replacing {0} with {1}", lookFor.Name, replaceWith.Name);
+                        Console.WriteLine("Patching local variable: Replacing {0} with {1}", lookFor.FullName, replaceWith.FullName);
+                        methodPatched = true;
                     }
                 }
 
@@ -52,7 +54,8 @@ namespace KSPLoader
                         if (typeRef.DeclaringType == lookFor)
                         {
                             typeRef = importedReplaceWith;
-                            Console.WriteLine("Patching InlineMethod: Replacing {0} with {1}", lookFor.Name, replaceWith.Name);
+                            Console.WriteLine("Patching InlineMethod: Replacing {0} with {1}", lookFor.FullName, replaceWith.FullName);
+                            methodPatched = true;
                         }
                     }
                     else if (operandType == OperandType.InlineMethod)
@@ -67,7 +70,12 @@ namespace KSPLoader
                                 if (replaceMethod.Name == methodName)
                                 {
                                     instruction.Operand = method.Module.Import(replaceMethod);
-                                    Console.WriteLine("Patching InlineMethod: Replacing {0}::{1} with {2}::{3}", lookFor.Name, methodName, replaceWith.Name, replaceMethod.Name);
+                                    Console.WriteLine
+                                    (
+                                        "Patching InlineMethod: Replacing {0}::{1} with {2}::{3}",
+                                        lookFor.FullName, methodName, replaceWith.FullName, replaceMethod.Name
+                                    );
+                                    methodPatched = true;
                                     break;
                                 }
                             }
@@ -87,6 +95,7 @@ namespace KSPLoader
                                 {
                                     instruction.Operand = method.Module.Import(replaceField);
                                     Console.WriteLine("Patching InlineField: Replacing {0}::{1} with {2}::{3}", lookFor.Name, fieldName, replaceWith.Name, replaceField.Name);
+                                    methodPatched = true;
                                     break;
                                 }
                             }
@@ -94,22 +103,69 @@ namespace KSPLoader
                     }
                 }   
             }
+
+            if (methodPatched)
+            {
+                Console.WriteLine("Patched method {0}", method.FullName);
+            }
+        }
+
+        private static void ProcessField(FieldDefinition field, TypeReference lookFor, TypeDefinition replaceWith)
+        {
+            var fieldTypeName = field.Resolve().FieldType.Name;
+            var lookForTypeName = lookFor.Name;
+
+            if (fieldTypeName == lookForTypeName)
+            {
+                Console.WriteLine("Patching Field: Replacing {0} with {1}", lookFor.FullName, replaceWith.FullName);
+            }
+        }
+
+        private static void ProcessProperty(PropertyDefinition property, TypeReference lookFor, TypeDefinition replaceWith)
+        {
+            var fieldTypeName = property.Resolve().PropertyType.Name;
+            var lookForTypeName = lookFor.Name;
+
+            if (fieldTypeName == lookForTypeName)
+            {
+                Console.WriteLine("Patching Property: Replacing {0} with {1}", lookFor.FullName, replaceWith.FullName);
+            }
         }
 
         static void Main(string[] args)
         {
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly("C:/Users/Alex Dzhoganov/Desktop/Assembly-CSharp.dll");
 
-            var fooType = myLibrary.MainModule.GetType("", "RnDBuilding");
+            var fooType = myLibrary.MainModule.GetType("", "XKCDColors");
+            if (fooType == null)
+            {
+                Console.WriteLine("Error, could not find type RnDBuilding in Assembly-CSharp");
+                return;
+            }
 
-            var barType = myLibrary.MainModule.Import(typeof(PatchLib.RnDBuilding)).Resolve();
+            var barType = myLibrary.MainModule.Import(typeof(PatchLib.XKCDColors)).Resolve();
 
-            Console.WriteLine("Replacing all TestLib.Foo references with PatchLib.Bar");
+            Console.WriteLine("Replacing all Assembly-CSharp.RndBuilding references with PatchLib.RnDBuilding");
             foreach (var typeDef in myLibrary.MainModule.Types)
             {
+                if (typeDef.Name == fooType.Name)
+                {
+                    continue;
+                }
+
                 foreach (var methodDef in typeDef.Methods)
                 {
                     ProcessMethod(methodDef, fooType, barType);
+                }
+
+                foreach (var fieldDef in typeDef.Fields)
+                {
+                    ProcessField(fieldDef, fooType, barType);
+                }
+
+                foreach (var propertyDef in typeDef.Properties)
+                {
+                    ProcessProperty(propertyDef, fooType, barType);
                 }
             }
 
