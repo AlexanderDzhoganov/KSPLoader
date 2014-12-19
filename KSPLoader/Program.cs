@@ -71,6 +71,8 @@ namespace KSPLoader
 
                         if (methodRef.DeclaringType == lookFor)
                         {
+                            bool methodFound = false;
+
                             foreach (var replaceMethod in replaceWith.Methods)
                             {
                                 if (replaceMethod.Name == methodName)
@@ -84,10 +86,15 @@ namespace KSPLoader
                                         lookFor.FullName, methodName, replaceWith.FullName, replaceMethod.Name
                                     );
                                     methodPatched = true;
+                                    methodFound = true;
                                     break;
                                 }
                             }
 
+                            if (!methodFound)
+                            {
+                                Console.WriteLine("CRITICAL ERROR: Function {0} not found in replacement class {1}", methodName, replaceWith.FullName);
+                            }
                         }
                     }
                     else if (operandType == OperandType.InlineField)
