@@ -7,7 +7,7 @@ using UnityEngine;
 namespace PatchLib
 {
 
-public static class XKCDColors_Patched
+public static class XKCDColors_Patched 
 {
   [Obsolete("This has been replaced by the Color.A(float) extension method.")]
   public static float NextColorAlpha = 1f;
@@ -16,7 +16,8 @@ public static class XKCDColors_Patched
   {
     get
     {
-      return new Color(0.7215686f, 0.792156f, 0.4470588f, 1f);
+        return XKCDColors.RedOrange;
+  //    return new Color(0.7215686f, 0.792156f, 0.4470588f, 1f);
     }
   }
 
@@ -24,7 +25,8 @@ public static class XKCDColors_Patched
   {
     get
     {
-      return new Color(1f, 0.694f, 0.0f, 1f);
+        return XKCDColors.AquaBlue;
+  //    return new Color(1f, 0.694f, 0.0f, 1f);
     }
   }
 
@@ -32,7 +34,8 @@ public static class XKCDColors_Patched
   {
     get
     {
-      return new Color(0.002122261f, 0.002260669f, 0.002399077f, 1f);
+        return new Color(0.4823529411764706f, 0.4666666666666667f, 0.807843137254902f);
+       // return new Color(0.002122261f, 0.002260669f, 0.002399077f, 1f);
     }
   }
 
@@ -48,7 +51,8 @@ public static class XKCDColors_Patched
   {
     get
     {
-      return new Color(0.9960784f, 0.9960784f, 0.9960784f, 1f);
+        return new Color(0.2823529411764706f, 0.2666666666666667f, 0.607843137254902f);
+     // return new Color(0.9960784f, 0.9960784f, 0.9960784f, 1f);
     }
   }
 
@@ -80,7 +84,8 @@ public static class XKCDColors_Patched
   {
     get
     {
-      return new Color(0.6588235f, 1f, 0.01568628f, 1f);
+        return XKCDColors.BlueGrey;
+       // return new Color(0.6588235f, 1f, 0.01568628f, 1f);
     }
   }
 
@@ -7576,7 +7581,8 @@ public static class XKCDColors_Patched
   {
     get
     {
-      return new Color(0.9764706f, 0.4509804f, 0.02352941f, 1f);
+        return XKCDColors.Blue;
+  //    return new Color(0.9764706f, 0.4509804f, 0.02352941f, 1f);
     }
   }
 
