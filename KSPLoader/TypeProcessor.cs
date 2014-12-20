@@ -10,7 +10,7 @@ namespace KSPLoader
     class TypeProcessor
     {
 
-        public static bool ProcessGenericInstanceType
+        public static bool SubstituteGenericInstanceType
         (
             Instruction instruction,
             MethodDefinition method,
@@ -39,7 +39,7 @@ namespace KSPLoader
             return replacedArg;
         }
 
-        public static bool ProcessInlineType
+        public static bool SubstituteTypeReference
         (
             Instruction instruction,
             MethodDefinition method,
@@ -84,7 +84,7 @@ namespace KSPLoader
             return false;
         }
 
-        public static bool ProcessInlineMethod
+        public static bool SubstituteMethodReference
         (
             Instruction instruction,
             MethodDefinition method,
@@ -137,7 +137,7 @@ namespace KSPLoader
 
         }
 
-        public static bool ProcessInlineField
+        public static bool SubstiteFieldReference
         (
             Instruction instruction,
             MethodDefinition method,
@@ -253,7 +253,7 @@ namespace KSPLoader
 
                     if (operandType == OperandType.InlineArg) 
                     {
-                     /*   var parameterDef = (ParameterDefinition)instruction.Operand;
+                        var parameterDef = (ParameterDefinition)instruction.Operand;
                         if (parameterDef.ParameterType.FullName == needle.FullName)
                         {
                             parameterDef.ParameterType = importedReplaceWith;
@@ -264,7 +264,7 @@ namespace KSPLoader
                         {
                             parameterDef.ParameterType.DeclaringType = importedReplaceWith;
                             methodPatched = true;
-                        }*/
+                        }
                     }
                     else if (operandType == OperandType.InlineBrTarget) {}
                     else if (operandType == OperandType.InlineField)
@@ -273,14 +273,14 @@ namespace KSPLoader
                         if (fieldRef.FieldType is GenericInstanceType)
                         {
                             var genericInstanceType = (GenericInstanceType)fieldRef.FieldType;
-                            if (ProcessGenericInstanceType(instruction, method, genericInstanceType, needle, replaceWith))
+                            if (SubstituteGenericInstanceType(instruction, method, genericInstanceType, needle, replaceWith))
                             {
                                 methodPatched = true;
                             }
                         }
                         else
                         {
-                            if (ProcessInlineField(instruction, method, fieldRef, needle, replaceWith))
+                            if (SubstiteFieldReference(instruction, method, fieldRef, needle, replaceWith))
                             {
                                 methodPatched = true;
                             }
@@ -291,7 +291,7 @@ namespace KSPLoader
                     else if (operandType == OperandType.InlineMethod)
                     {
                         var methodRef = (MethodReference)instruction.Operand;
-                        if (ProcessInlineMethod(instruction, method, methodRef, needle, replaceWith))
+                        if (SubstituteMethodReference(instruction, method, methodRef, needle, replaceWith))
                         {
                             methodPatched = true;
                         }
@@ -304,12 +304,12 @@ namespace KSPLoader
                     else if (operandType == OperandType.InlineSwitch) {}
                     else if (operandType == OperandType.InlineTok)
                     {
-                       /* var type = instruction.Operand.GetType();
+                        var type = instruction.Operand.GetType();
                         if (type.Name == "MethodDefinition")
                         {
                             var methodRef = (MethodReference)instruction.Operand;
 
-                            if (ProcessInlineMethod(instruction, method, methodRef, needle, replaceWith))
+                            if (SubstituteMethodReference(instruction, method, methodRef, needle, replaceWith))
                             {
                                 methodPatched = true;
                             }
@@ -317,7 +317,7 @@ namespace KSPLoader
                         else if(type.Name == "FieldDefinition")
                         {
                             var fieldRef = (FieldReference)instruction.Operand;
-                            if (ProcessInlineField(instruction, method, fieldRef, needle, replaceWith))
+                            if (SubstiteFieldReference(instruction, method, fieldRef, needle, replaceWith))
                             {
                                 methodPatched = true;
                             }
@@ -329,18 +329,18 @@ namespace KSPLoader
                         else if (type.Name == "TypeDefinition")
                         {
                             var typeRef = (TypeReference)instruction.Operand;
-                            if (ProcessInlineType(instruction, method, typeRef, needle, replaceWith))
+                            if (SubstituteTypeReference(instruction, method, typeRef, needle, replaceWith))
                             {
                                 methodPatched = true;
                             }
-                        }*/
+                        }
                     }
                     else if (operandType == OperandType.InlineType)
                     {
                         if (instruction.Operand is GenericInstanceType)
                         {
                             var genericInstanceType = (GenericInstanceType)instruction.Operand;
-                            if (ProcessGenericInstanceType(instruction, method, genericInstanceType, needle, replaceWith))
+                            if (SubstituteGenericInstanceType(instruction, method, genericInstanceType, needle, replaceWith))
                             {
                                 methodPatched = true;
                             } 
@@ -348,7 +348,7 @@ namespace KSPLoader
                         else if (instruction.Operand is TypeReference)
                         {
                             var typeRef = (TypeReference)instruction.Operand;
-                            if (ProcessInlineType(instruction, method, typeRef, needle, replaceWith))
+                            if (SubstituteTypeReference(instruction, method, typeRef, needle, replaceWith))
                             {
                                 methodPatched = true;
                             }  
@@ -356,7 +356,7 @@ namespace KSPLoader
                     }
                     else if (operandType == OperandType.InlineVar)
                     {
-                      /*  var variableDef = (VariableDefinition) instruction.Operand;
+                        var variableDef = (VariableDefinition) instruction.Operand;
                         if (variableDef.VariableType.FullName == needle.FullName)
                         {
                             variableDef.VariableType = importedReplaceWith;
@@ -367,11 +367,11 @@ namespace KSPLoader
                         {
                             variableDef.VariableType.DeclaringType = importedReplaceWith;
                             methodPatched = true;
-                        }*/
+                        }
                     }
                     else if (operandType == OperandType.ShortInlineArg)
                     {
-                    /*    var parameterDef = (ParameterDefinition)instruction.Operand;
+                        var parameterDef = (ParameterDefinition)instruction.Operand;
                         if (parameterDef.ParameterType.FullName == needle.FullName)
                         {
                             parameterDef.ParameterType = importedReplaceWith;
@@ -382,14 +382,14 @@ namespace KSPLoader
                         {
                             parameterDef.ParameterType.DeclaringType = importedReplaceWith;
                             methodPatched = true;
-                        }*/
+                        }
                     }
                     else if (operandType == OperandType.ShortInlineBrTarget) {}
                     else if (operandType == OperandType.ShortInlineI) {}
                     else if (operandType == OperandType.ShortInlineR) {}
                     else if (operandType == OperandType.ShortInlineVar)
                     {
-/*                        var variableDef = (VariableDefinition)instruction.Operand;
+                        var variableDef = (VariableDefinition)instruction.Operand;
                         if (variableDef.VariableType.FullName == needle.FullName)
                         {
                             variableDef.VariableType = importedReplaceWith;
@@ -400,7 +400,7 @@ namespace KSPLoader
                         {
                             variableDef.VariableType.DeclaringType = importedReplaceWith;
                             methodPatched = true;
-                        }*/
+                        }
                     }
                 }   
             }

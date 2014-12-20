@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace PatchLib
@@ -36,13 +37,10 @@ namespace PatchLib
 		    rotateZ = 0f;
 		    wheelTransforms = new List<Transform>();
 		    layerMask = 622593;
-            MonoBehaviour.print("############ WHEEL INITIALIZED ################");
-        }
+	    }
 
 	    public void Update()
 	    {
-            MonoBehaviour.print("############ WHEEL UPDATE ################");
-
 		    if (isValid)
 		    {
 			    Vector3 position = suspensionNeutralPoint.position;
@@ -64,71 +62,19 @@ namespace PatchLib
 		        }
 		    }
 	    }
-	    public void Load(ConfigNode node)
-	    {
-		  /*  this.wheelName = node.GetValue(.(134457));
-		    this.wheelColliderName = node.GetValue(.(134476));
-		    this.suspensionTransformName = node.GetValue(.(134511));
-		    this.suspensionNeutralPointName = node.GetValue(.(134558));
-		    this.damagedObjectName = node.GetValue(.(134611));
 
-		    if (node.HasValue(.(134646)))
-		    {
-			    while (true)
-			    {
-				    switch (4)
-				    {
-				    case 0:
-					    continue;
-				    }
-				    break;
-			    }
-			    if (!true)
-			    {
-				    System.RuntimeMethodHandle arg_AA_0 = methodof(Wheel.Load(ConfigNode)).MethodHandle;
-			    }
-			    this.rotateX = float.Parse(node.GetValue(.(134646)));
-		    }
-		    if (node.HasValue(.(134661)))
-		    {
-			    while (true)
-			    {
-				    switch (2)
-				    {
-				    case 0:
-					    continue;
-				    }
-				    break;
-			    }
-			    this.rotateY = float.Parse(node.GetValue(.(134661)));
-		    }
-		    if (node.HasValue(.(134676)))
-		    {
-			    while (true)
-			    {
-				    switch (5)
-				    {
-				    case 0:
-					    continue;
-				    }
-				    break;
-			    }
-			    this.rotateZ = float.Parse(node.GetValue(.(134676)));
-		    }
-		    Vector3 vector = new Vector3(this.rotateX, this.rotateY, this.rotateZ);
-		    this.wheelAxis = vector.normalized;*/
+        public void Load(ConfigNode node)
+	    {
+            wheelName = node.GetValue("wheelName");
+		    wheelColliderName = node.GetValue("wheelColliderName");
+		    suspensionTransformName = node.GetValue("suspensionTransformName");
+		    suspensionNeutralPointName = node.GetValue("suspensionNeutralPointName");
+            damagedObjectName = node.GetValue("damagedObjectName");
+
 	    }
 
 	    public void Save(ConfigNode node)
 	    {
-		 /*   node.AddValue(.(134457), this.wheelName);
-		    node.AddValue(.(134476), this.wheelColliderName);
-		    node.AddValue(.(134511), this.suspensionTransformName);
-		    node.AddValue(.(134558), this.suspensionNeutralPointName);
-		    node.AddValue(.(134611), this.damagedObjectName);
-		    node.AddValue(.(134646), this.rotateX);
-		    node.AddValue(.(134661), this.rotateY);
-		    node.AddValue(.(134676), this.rotateZ);*/
 	    }
 
 	    public void damageWheel()

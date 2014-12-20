@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using Mono.Cecil;
 
@@ -20,24 +21,17 @@ namespace KSPLoader
             m_Assembly.Write(path);
         }
 
-        public bool Tag(string _namespace, string _type, Type _replaceWith)
+        public TypeDefinition FindTypeByName(string _namespace, string _type)
         {
-            var findType = m_Assembly.MainModule.GetType(_namespace, _type);
-            if (findType == null)
-            {
-                Console.WriteLine("Error, could not find type RnDBuilding in Assembly-CSharp");
-                return false;
-            }
-
-            var replaceType = m_Assembly.MainModule.Import(_replaceWith).Resolve();
-
-            Console.WriteLine("Replacing all references to {0} with {1}", findType.FullName, _replaceWith.FullName);
-            Tag(m_Assembly.MainModule.Types, findType, replaceType);
-
-            return true;
+            return m_Assembly.MainModule.GetType(_namespace, _type);
         }
 
-        private void Tag(ICollection<TypeDefinition> _haystack, TypeDefinition _needle, TypeDefinition _replaceWith)
+        public void SubstituteTypes(TypeDefinition _needle, TypeDefinition _replaceWith)
+        {
+            SubstituteTypes(m_Assembly.MainModule.Types, _needle, _replaceWith);
+        }
+
+        private void SubstituteTypes(ICollection<TypeDefinition> _haystack, TypeDefinition _needle, TypeDefinition _replaceWith)
         {
             foreach (var typeDef in _haystack)
             {
