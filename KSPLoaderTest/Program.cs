@@ -15,8 +15,8 @@ namespace KSPLoader
                 new AssemblyProcessor(
                     "C:/Program Files (x86)/Steam/steamapps/common/Kerbal Space Program/KSP_Data/Managed/PatchLib.dll");
 
-            var typeToPatch = outputAssembly.FindTypeByName("", "Wheel");
-            var newType = inputAssembly.FindTypeByName("PatchLib", "WheelPatched");
+            var typeToPatch = outputAssembly.FindTypeByName("", "CrewGenerator");
+            var newType = inputAssembly.FindTypeByName("PatchLib", "CrewGenerator_v2");
             outputAssembly.SubstituteTypes(typeToPatch, newType);
 
             outputAssembly.Write("C:/Program Files (x86)/Steam/steamapps/common/Kerbal Space Program/KSP_Data/Managed/Assembly-CSharp.dll");

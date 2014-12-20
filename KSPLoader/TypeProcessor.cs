@@ -128,11 +128,6 @@ namespace KSPLoader
                 }
             }
 
-          /*  if (!methodPatched)
-            {
-                Console.WriteLine("CRITICAL ERROR: Function {0} not found in replacement class {1}", methodRef.FullName, replaceWith.FullName);
-            }*/
-
             return methodPatched;
 
         }
@@ -153,7 +148,7 @@ namespace KSPLoader
             }
             else if (instruction.Operand is GenericInstanceType)
             {
-                int q = 0;
+                Console.WriteLine("NOT IMPLEMENTED: SubstiteFieldReference: instruction.Operand is GenericInstanceType");
             }
 
             return false;
@@ -164,11 +159,6 @@ namespace KSPLoader
             if (method.DeclaringType.FullName == needle.FullName)
             {
                 return;
-            }
-
-            if (method.FullName == "System.Void ModuleWheel::OnAwake()")
-            {
-                int p = 0;
             }
 
             bool methodPatched = false;
@@ -188,7 +178,7 @@ namespace KSPLoader
                 else if (method.ReturnType.DeclaringType != null &&
                     method.ReturnType.DeclaringType.FullName == needle.FullName)
                 {
-                    Console.WriteLine("NOT IMPLEMENTED: method.ReturnType.DeclaringType == needle");
+                    Console.WriteLine("NOT IMPLEMENTED: ProcessMethod: method.ReturnType.DeclaringType == needle");
                 }
 
                 for (int i = 0; i < method.Parameters.Count; i++)
@@ -201,7 +191,7 @@ namespace KSPLoader
                     else if (method.Parameters[i].ParameterType.DeclaringType != null &&
                         method.Parameters[i].ParameterType.DeclaringType.FullName == needle.FullName)
                     {
-                        Console.WriteLine("NOT IMPLEMENTED: method.Parameters[i].ParameterType.DeclaringType == needle");
+                        Console.WriteLine("NOT IMPLEMENTED: ProcessMethod: method.Parameters[i].ParameterType.DeclaringType == needle");
                     }
                 }
 
@@ -210,7 +200,7 @@ namespace KSPLoader
                     if (method.GenericParameters[i].DeclaringType != null &&
                         method.GenericParameters[i].DeclaringType.FullName == needle.FullName)
                     {
-                        Console.WriteLine("NOT IMPLEMENTED: method.GenericParameters[i].DeclaringType == needle");
+                        Console.WriteLine("NOT IMPLEMENTED: ProcessMethod: method.GenericParameters[i].DeclaringType == needle");
                     }
                 }
 
@@ -235,14 +225,6 @@ namespace KSPLoader
                                 methodPatched = true;
                             }
                         }
-                    }
-                }
-
-                if (method.Body.Scope != null)
-                {
-                    for (int i = 0; i < method.Body.Scope.Variables.Count; i++)
-                    {
-                        int q = 0;
                     }
                 }
 
@@ -324,7 +306,7 @@ namespace KSPLoader
                         }
                         else if (type.Name == "PropertyDefinition")
                         {
-                            Console.WriteLine("NOT IMPLEMENTED: else if (type.Name == \"PropertyDefinition\")");
+                            Console.WriteLine("NOT IMPLEMENTED: ProcessMethod else if (type.Name == \"PropertyDefinition\")");
                         }
                         else if (type.Name == "TypeDefinition")
                         {
@@ -407,7 +389,7 @@ namespace KSPLoader
 
             if (methodPatched)
             {
-                Console.WriteLine("##### Patched method {0} #####", method.FullName);
+                Console.WriteLine("Patched method {0}", method.FullName);
             }
         }
 
@@ -416,13 +398,13 @@ namespace KSPLoader
             if (field.FieldType.FullName == needle.FullName)
             {
                 field.FieldType = needle;
-                Console.WriteLine("### Patched Field: Replacing {0} with {1} ###", needle.FullName, replaceWith.FullName);
+                Console.WriteLine("Patched Field: Replacing {0} with {1}", needle.FullName, replaceWith.FullName);
             }
             else if (field.FieldType.DeclaringType != null)
             {
                 if (field.FieldType.DeclaringType.FullName == needle.FullName)
                 {
-                    Console.WriteLine("NOT IMPLEMENTED: field.FieldType.DeclaringType.FullName == needle.FullName");
+                    Console.WriteLine("NOT IMPLEMENTED: ProcessField: field.FieldType.DeclaringType.FullName == needle.FullName");
                 }
             }
             else if (field.FieldType is GenericInstanceType)
@@ -443,12 +425,12 @@ namespace KSPLoader
             if (property.PropertyType.FullName == needle.FullName)
             {
                 property.PropertyType = needle;
-                Console.WriteLine("### Patched Property: Replacing {0} with {1} ###", needle.FullName, replaceWith.FullName);
+                Console.WriteLine("Patched Property: Replacing {0} with {1}", needle.FullName, replaceWith.FullName);
             }
             else if (property.PropertyType.DeclaringType != null &&
                 property.PropertyType.DeclaringType.FullName == needle.FullName)
             {
-                Console.WriteLine("NOT IMPLEMENTED: property.PropertyType.DeclaringType.FullName == needle.FullName");
+                Console.WriteLine("NOT IMPLEMENTED: ProcessProperty: property.PropertyType.DeclaringType.FullName == needle.FullName");
             }
             else if (property.PropertyType is GenericInstanceType)
             {
