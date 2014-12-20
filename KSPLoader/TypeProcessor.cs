@@ -97,8 +97,6 @@ namespace KSPLoader
 
             if (methodRef.DeclaringType.FullName == needle.FullName)
             {
-                bool methodFound = false;
-
                 foreach (var replaceMethod in replaceWith.Methods)
                 {
                     if (replaceMethod.Name == methodRef.Name)
@@ -113,16 +111,27 @@ namespace KSPLoader
                         );
 
                         methodPatched = true;
-                        methodFound = true;
                         break;
                     }
                 }
-
-                if (!methodFound)
+            }
+            else if (methodRef.DeclaringType is GenericInstanceType)
+            {
+                var genericInstanceType = (GenericInstanceType) methodRef.DeclaringType;
+                for (int i = 0; i < genericInstanceType.GenericArguments.Count; i++)
                 {
-                    Console.WriteLine("CRITICAL ERROR: Function {0} not found in replacement class {1}", methodRef.FullName, replaceWith.FullName);
+                    if (genericInstanceType.GenericArguments[i].FullName == needle.FullName)
+                    {
+                        genericInstanceType.GenericArguments[i] = method.Module.Import(replaceWith);
+                        methodPatched = true;
+                    }
                 }
             }
+
+          /*  if (!methodPatched)
+            {
+                Console.WriteLine("CRITICAL ERROR: Function {0} not found in replacement class {1}", methodRef.FullName, replaceWith.FullName);
+            }*/
 
             return methodPatched;
 
@@ -142,13 +151,22 @@ namespace KSPLoader
                 instruction.Operand = method.Module.Import(replaceWith);
                 Console.WriteLine("Patching InlineField: Replacing {0} with {1}", needle.FullName, replaceWith.FullName);
             }
+            else if (instruction.Operand is GenericInstanceType)
+            {
+                int q = 0;
+            }
 
             return false;
         }
 
         public static void ProcessMethod(MethodDefinition method, TypeReference needle, TypeDefinition replaceWith)
         {
-            if (method.Name == "SetupWheel")
+            if (method.DeclaringType.FullName == needle.FullName)
+            {
+                return;
+            }
+
+            if (method.FullName == "System.Void ModuleWheel::OnAwake()")
             {
                 int p = 0;
             }
@@ -204,10 +222,19 @@ namespace KSPLoader
                         Console.WriteLine("Patching local variable: Replacing {0} with {1}", needle.FullName, replaceWith.FullName);
                         methodPatched = true;
                     }
-                    else if (method.Body.Variables[i].VariableType.DeclaringType != null &&
-                        method.Body.Variables[i].VariableType.DeclaringType.FullName == needle.FullName)
+
+                    if (method.Body.Variables[i].VariableType.DeclaringType != null && 
+                        method.Body.Variables[i].VariableType.DeclaringType.HasGenericParameters)
                     {
-                        Console.WriteLine("NOT IMPLEMENTED: method.Body.Variables[i].VariableType.DeclaringType == needle");
+                        var genericInstanceType = (GenericInstanceType) method.Body.Variables[i].VariableType;
+                        for (int q = 0; q < genericInstanceType.GenericArguments.Count; q++)
+                        {
+                            if (genericInstanceType.GenericArguments[q].FullName == needle.FullName)
+                            {
+                                genericInstanceType.GenericArguments[q] = importedReplaceWith;
+                                methodPatched = true;
+                            }
+                        }
                     }
                 }
 
@@ -224,28 +251,60 @@ namespace KSPLoader
                     Instruction instruction = instructions[i];
                     var operandType = instruction.OpCode.OperandType;
 
-                    if (operandType == OperandType.InlineType)
+                    if (operandType == OperandType.InlineArg) 
                     {
-                        if (instruction.Operand is GenericInstanceType)
+                     /*   var parameterDef = (ParameterDefinition)instruction.Operand;
+                        if (parameterDef.ParameterType.FullName == needle.FullName)
                         {
-                            var genericInstanceType = (GenericInstanceType)instruction.Operand;
+                            parameterDef.ParameterType = importedReplaceWith;
+                            methodPatched = true;
+                        }
+                        else if (parameterDef.ParameterType.DeclaringType != null &&
+                            parameterDef.ParameterType.DeclaringType.FullName == needle.FullName)
+                        {
+                            parameterDef.ParameterType.DeclaringType = importedReplaceWith;
+                            methodPatched = true;
+                        }*/
+                    }
+                    else if (operandType == OperandType.InlineBrTarget) {}
+                    else if (operandType == OperandType.InlineField)
+                    {
+                        var fieldRef = (FieldReference)instruction.Operand;
+                        if (fieldRef.FieldType is GenericInstanceType)
+                        {
+                            var genericInstanceType = (GenericInstanceType)fieldRef.FieldType;
                             if (ProcessGenericInstanceType(instruction, method, genericInstanceType, needle, replaceWith))
                             {
                                 methodPatched = true;
-                            } 
+                            }
                         }
-                        else if (instruction.Operand is TypeReference)
+                        else
                         {
-                            var typeRef = (TypeReference)instruction.Operand;
-                            if (ProcessInlineType(instruction, method, typeRef, needle, replaceWith))
+                            if (ProcessInlineField(instruction, method, fieldRef, needle, replaceWith))
                             {
                                 methodPatched = true;
-                            }  
+                            }
                         }
                     }
+                    else if (operandType == OperandType.InlineI) {}
+                    else if (operandType == OperandType.InlineI8) {}
+                    else if (operandType == OperandType.InlineMethod)
+                    {
+                        var methodRef = (MethodReference)instruction.Operand;
+                        if (ProcessInlineMethod(instruction, method, methodRef, needle, replaceWith))
+                        {
+                            methodPatched = true;
+                        }
+                    }
+                    else if (operandType == OperandType.InlineNone) {}
+                    else if (operandType == OperandType.InlinePhi) {}
+                    else if (operandType == OperandType.InlineR) {}
+                    else if (operandType == OperandType.InlineSig) {}
+                    else if (operandType == OperandType.InlineString) {}
+                    else if (operandType == OperandType.InlineSwitch) {}
                     else if (operandType == OperandType.InlineTok)
                     {
-                        var type = instruction.Operand.GetType();
+                       /* var type = instruction.Operand.GetType();
                         if (type.Name == "MethodDefinition")
                         {
                             var methodRef = (MethodReference)instruction.Operand;
@@ -274,27 +333,30 @@ namespace KSPLoader
                             {
                                 methodPatched = true;
                             }
-                        }
+                        }*/
                     }
-                    else if (operandType == OperandType.InlineMethod)
+                    else if (operandType == OperandType.InlineType)
                     {
-                        var methodRef = (MethodReference)instruction.Operand;
-                        if (ProcessInlineMethod(instruction, method, methodRef, needle, replaceWith))
+                        if (instruction.Operand is GenericInstanceType)
                         {
-                            methodPatched = true;
+                            var genericInstanceType = (GenericInstanceType)instruction.Operand;
+                            if (ProcessGenericInstanceType(instruction, method, genericInstanceType, needle, replaceWith))
+                            {
+                                methodPatched = true;
+                            } 
                         }
-                    }
-                    else if (operandType == OperandType.InlineField)
-                    {
-                        var fieldRef = (FieldReference) instruction.Operand;
-                        if (ProcessInlineField(instruction, method, fieldRef, needle, replaceWith))
+                        else if (instruction.Operand is TypeReference)
                         {
-                            methodPatched = true;
+                            var typeRef = (TypeReference)instruction.Operand;
+                            if (ProcessInlineType(instruction, method, typeRef, needle, replaceWith))
+                            {
+                                methodPatched = true;
+                            }  
                         }
                     }
-                    else if (operandType == OperandType.ShortInlineVar)
+                    else if (operandType == OperandType.InlineVar)
                     {
-                        var variableDef = (VariableDefinition) instruction.Operand;
+                      /*  var variableDef = (VariableDefinition) instruction.Operand;
                         if (variableDef.VariableType.FullName == needle.FullName)
                         {
                             variableDef.VariableType = importedReplaceWith;
@@ -305,26 +367,11 @@ namespace KSPLoader
                         {
                             variableDef.VariableType.DeclaringType = importedReplaceWith;
                             methodPatched = true;
-                        }
-                    }
-                    else if (operandType == OperandType.InlineArg)
-                    {
-                        var parameterDef = (ParameterDefinition)instruction.Operand;
-                        if (parameterDef.ParameterType.FullName == needle.FullName)
-                        {
-                            parameterDef.ParameterType = importedReplaceWith;
-                            methodPatched = true;
-                        }
-                        else if (parameterDef.ParameterType.DeclaringType != null &&
-                            parameterDef.ParameterType.DeclaringType.FullName == needle.FullName)
-                        {
-                            parameterDef.ParameterType.DeclaringType = importedReplaceWith;
-                            methodPatched = true;
-                        }
+                        }*/
                     }
                     else if (operandType == OperandType.ShortInlineArg)
                     {
-                        var parameterDef = (ParameterDefinition)instruction.Operand;
+                    /*    var parameterDef = (ParameterDefinition)instruction.Operand;
                         if (parameterDef.ParameterType.FullName == needle.FullName)
                         {
                             parameterDef.ParameterType = importedReplaceWith;
@@ -335,41 +382,25 @@ namespace KSPLoader
                         {
                             parameterDef.ParameterType.DeclaringType = importedReplaceWith;
                             methodPatched = true;
+                        }*/
+                    }
+                    else if (operandType == OperandType.ShortInlineBrTarget) {}
+                    else if (operandType == OperandType.ShortInlineI) {}
+                    else if (operandType == OperandType.ShortInlineR) {}
+                    else if (operandType == OperandType.ShortInlineVar)
+                    {
+/*                        var variableDef = (VariableDefinition)instruction.Operand;
+                        if (variableDef.VariableType.FullName == needle.FullName)
+                        {
+                            variableDef.VariableType = importedReplaceWith;
+                            methodPatched = true;
                         }
-                    }
-                    else if (operandType == OperandType.InlineSig)
-                    {
-                    }
-                    else if (operandType == OperandType.InlineNone)
-                    {
-                    }
-                    else if (operandType == OperandType.InlineI)
-                    {
-                    }
-                    else if (operandType == OperandType.InlineI8)
-                    {
-                    }
-                    else if (operandType == OperandType.ShortInlineI)
-                    {
-                    }
-                    else if (operandType == OperandType.InlineR)
-                    {
-                    }
-                    else if (operandType == OperandType.ShortInlineR)
-                    {
-                    }                    
-                    else if (operandType == OperandType.ShortInlineBrTarget)
-                    {
-                    }
-                    else if (operandType == OperandType.InlineBrTarget)
-                    {
-                    }
-                    else if (operandType == OperandType.InlineSwitch)
-                    {
-                    }
-                    else
-                    {
-                        Console.WriteLine("NOT IMPLEMENTED: operandType == {0}", operandType);
+                        else if (variableDef.VariableType.DeclaringType != null &&
+                            variableDef.VariableType.DeclaringType.FullName == needle.FullName)
+                        {
+                            variableDef.VariableType.DeclaringType = importedReplaceWith;
+                            methodPatched = true;
+                        }*/
                     }
                 }   
             }
@@ -387,10 +418,23 @@ namespace KSPLoader
                 field.FieldType = needle;
                 Console.WriteLine("### Patched Field: Replacing {0} with {1} ###", needle.FullName, replaceWith.FullName);
             }
-            else if (field.FieldType.DeclaringType != null && 
-                field.FieldType.DeclaringType.FullName == needle.FullName)
+            else if (field.FieldType.DeclaringType != null)
             {
-                Console.WriteLine("NOT IMPLEMENTED: field.FieldType.DeclaringType.FullName == needle.FullName");
+                if (field.FieldType.DeclaringType.FullName == needle.FullName)
+                {
+                    Console.WriteLine("NOT IMPLEMENTED: field.FieldType.DeclaringType.FullName == needle.FullName");
+                }
+            }
+            else if (field.FieldType is GenericInstanceType)
+            {
+                var genericInstanceType = (GenericInstanceType)field.FieldType;
+                for (int i = 0; i < genericInstanceType.GenericArguments.Count; i++)
+                {
+                    if (genericInstanceType.GenericArguments[i].FullName == needle.FullName)
+                    {
+                        genericInstanceType.GenericArguments[i] = field.Module.Import(replaceWith);
+                    }
+                }
             }
         }
 
@@ -405,6 +449,17 @@ namespace KSPLoader
                 property.PropertyType.DeclaringType.FullName == needle.FullName)
             {
                 Console.WriteLine("NOT IMPLEMENTED: property.PropertyType.DeclaringType.FullName == needle.FullName");
+            }
+            else if (property.PropertyType is GenericInstanceType)
+            {
+                var genericInstanceType = (GenericInstanceType)property.PropertyType;
+                for (int i = 0; i < genericInstanceType.GenericArguments.Count; i++)
+                {
+                    if (genericInstanceType.GenericArguments[i].FullName == needle.FullName)
+                    {
+                        genericInstanceType.GenericArguments[i] = property.Module.Import(replaceWith);
+                    }
+                }
             }
         }
 

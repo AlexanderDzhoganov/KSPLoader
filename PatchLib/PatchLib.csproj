@@ -52,7 +52,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y PatchLib.dll "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y PatchLib.dll "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_Data\Managed\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
