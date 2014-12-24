@@ -1,6 +1,7 @@
 ﻿using System;
+using KSPLoader;
 
-namespace KSPLoader
+namespace KSPLoaderTest
 {
     class Program
     {
@@ -15,15 +16,15 @@ namespace KSPLoader
                 new AssemblyProcessor(
                     "C:/Program Files (x86)/Steam/steamapps/common/Kerbal Space Program/KSP_Data/Managed/PatchLib.dll");
 
-            var typeToPatch = outputAssembly.FindTypeByName("", "CrewGenerator");
-            var newType = inputAssembly.FindTypeByName("PatchLib", "CrewGenerator_v2");
-            outputAssembly.SubstituteTypes(typeToPatch, newType);
+            outputAssembly.SubstituteTypes
+            (
+                outputAssembly.FindTypeByName("", "CrewGenerator"), 
+                inputAssembly.FindTypeByName("PatchLib", "CrewGenerator_v2")
+            );
 
             outputAssembly.Write("C:/Program Files (x86)/Steam/steamapps/common/Kerbal Space Program/KSP_Data/Managed/Assembly-CSharp.dll");
 
             Console.WriteLine("Assembly patched");
-
-            for (;;) ;
         }
     }
 }
