@@ -17,7 +17,7 @@ namespace KSPLoader
                     return;
                 }
 
-                var path = Path.Combine(KSPUtil.ApplicationRootPath, relativePath);
+                var path = Path.Combine("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cities_Skylines\\", relativePath);
                 m_File = File.Open(path, FileMode.Create, FileAccess.Write);
             }
 

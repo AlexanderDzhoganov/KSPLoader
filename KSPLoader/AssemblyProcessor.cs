@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace KSPLoader
 {
@@ -49,6 +50,27 @@ namespace KSPLoader
                 foreach (var propertyDef in typeDef.Properties)
                 {
                     TypeProcessor.ProcessProperty(propertyDef, _needle, _replaceWith);
+                }
+            }
+        }
+
+        public void SubstituteLiteral(TypeDefinition _needle, int searchFor, int replaceWith)
+        {
+            SubstituteLiteral(m_Assembly.MainModule.Types, _needle, searchFor, replaceWith);
+        }
+
+        private void SubstituteLiteral(ICollection<TypeDefinition> _haystack, TypeDefinition _needle, int searchFor, int replaceWith)
+        {
+            foreach (var typeDef in _haystack)
+            {
+                if (typeDef.Name != _needle.Name)
+                {
+                    continue;
+                }
+
+                foreach (var methodDef in typeDef.Methods)
+                {
+                    TypeProcessor.SubstituteInlineInt32(methodDef, searchFor, replaceWith);
                 }
             }
         }

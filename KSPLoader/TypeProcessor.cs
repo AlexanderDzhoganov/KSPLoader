@@ -2,10 +2,43 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
+// int32 - OpCodes.Ldc_I4
+
 namespace KSPLoader
 {
     class TypeProcessor
     {
+
+        public static void SubstituteInlineInt32(MethodDefinition method, int searchValue,
+            int replaceValue)
+        {
+            if (method.HasBody)
+            {
+                Mono.Collections.Generic.Collection<Instruction> instructions = method.Body.Instructions;
+
+                for (int i = 0; i < instructions.Count; i++)
+                {
+                    Instruction instruction = instructions[i];
+                    var operandType = instruction.OpCode.OperandType;
+
+                    if (instruction.Operand != null)
+                    {
+                        var t = instruction.Operand.GetType();
+
+                        if (instruction.OpCode == OpCodes.Ldc_I4)
+                        {
+                            if ((int)instruction.Operand == searchValue)
+                            {
+                                instruction.Operand = replaceValue;
+
+                                Console.WriteLine("SubstituteInlineOperand: {0}, OpCode: Ldc_I4, Replacing {1} with {2}", method.FullName, searchValue, replaceValue);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         public static bool SubstituteGenericInstanceType
         (
@@ -230,6 +263,19 @@ namespace KSPLoader
                     Instruction instruction = instructions[i];
                     var operandType = instruction.OpCode.OperandType;
 
+                    if (instruction.Operand != null)
+                    {
+                        var t = instruction.Operand.GetType();
+
+                        if (instruction.OpCode == OpCodes.Ldc_I4)
+                        {
+                            if ((int)instruction.Operand == 250000)
+                            {
+                                int q = 0;
+                            }
+                        }
+                    }
+
                     if (operandType == OperandType.InlineArg) 
                     {
                         var parameterDef = (ParameterDefinition)instruction.Operand;
@@ -249,6 +295,7 @@ namespace KSPLoader
                     else if (operandType == OperandType.InlineField)
                     {
                         var fieldRef = (FieldReference)instruction.Operand;
+
                         if (fieldRef.FieldType is GenericInstanceType)
                         {
                             var genericInstanceType = (GenericInstanceType)fieldRef.FieldType;
